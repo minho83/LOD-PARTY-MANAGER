@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir /a)",
+      "Bash(xargs grep -l \"discord\\\\|webhook\")",
+      "Bash(python3:*)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --turbopack)",
+      "Bash(npx create-next-app@latest lod-party-temp --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --turbopack)",
+      "Bash(npm install prisma @prisma/client next-auth@beta @auth/prisma-adapter @supabase/supabase-js discord.js zod react-hook-form @hookform/resolvers date-fns lucide-react class-variance-authority clsx tailwind-merge)",
+      "Bash(npx prisma init)",
+      "Bash(npx shadcn@latest init -d)"
+    ]
+  }
+}
