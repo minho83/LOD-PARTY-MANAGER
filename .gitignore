@@ -1,5 +1,35 @@
+# dependencies
 node_modules
-# Keep environment variables out of version control
-.env
+.pnp
+.pnp.js
 
+# next.js
+.next/
+out/
+
+# production
+build/
+
+# env files
+.env
+.env.local
+.env.*.local
+
+# debug
+npm-debug.log*
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Prisma generated
 /src/generated/prisma
+
+# Claude
+.claude/plans/
