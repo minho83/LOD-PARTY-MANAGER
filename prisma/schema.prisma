@@ -60,8 +60,8 @@ model User {
   emailVerified DateTime?
   image         String?
 
-  discordId         String  @unique
-  discordUsername   String
+  discordId         String?  @unique
+  discordUsername   String?
   discordGlobalName String?
   discordAvatar    String?
 

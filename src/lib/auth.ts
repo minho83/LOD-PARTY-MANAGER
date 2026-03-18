@@ -11,7 +11,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       authorization: {
         params: { scope: "identify email guilds" },
       },
-      // Discord 프로필 → DB User 매핑
+      // 표준 필드만 반환 (커스텀 필드는 signIn 콜백에서 처리)
       profile(profile) {
         return {
           id: profile.id,
@@ -20,15 +20,30 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           image: profile.avatar
             ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.webp`
             : null,
-          discordId: profile.id,
-          discordUsername: profile.username,
-          discordGlobalName: profile.global_name ?? null,
-          discordAvatar: profile.avatar ?? null,
         };
       },
     }),
   ],
   callbacks: {
+    async signIn({ user, account, profile }) {
+      // Discord 로그인 시 커스텀 필드 업데이트
+      if (account?.provider === "discord" && profile && user.id) {
+        try {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              discordId: profile.id as string,
+              discordUsername: (profile as Record<string, unknown>).username as string,
+              discordGlobalName: ((profile as Record<string, unknown>).global_name as string) ?? null,
+              discordAvatar: ((profile as Record<string, unknown>).avatar as string) ?? null,
+            },
+          });
+        } catch {
+          // 첫 로그인 시 user가 아직 생성 중일 수 있음 - 무시
+        }
+      }
+      return true;
+    },
     async session({ session, user }) {
       // user 객체는 DB adapter 사용 시 DB에서 가져온 유저
       session.user.id = user.id;

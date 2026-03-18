@@ -1,9 +1,22 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { ROUTES } from "@/constants/routes";
+import { PartyCard } from "@/components/party/party-card";
 
 export default async function PartiesPage() {
   const session = await auth();
+
+  const parties = await prisma.party.findMany({
+    where: { status: "RECRUITING" },
+    include: {
+      creator: {
+        select: { name: true, image: true },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
 
   return (
     <div>
@@ -46,29 +59,39 @@ export default async function PartiesPage() {
         </div>
       )}
 
-      {/* 파티 목록 - 아직 구현 전 */}
-      <div className="glass-card flex flex-col items-center justify-center rounded-xl p-12 text-center">
-        <div className="mb-4 text-5xl">🎮</div>
-        <h3 className="mb-2 text-lg font-semibold">아직 모집 중인 파티가 없습니다</h3>
-        <p className="mb-6 text-sm text-muted-foreground">
-          첫 번째 파티를 만들어보세요!
-        </p>
-        {session?.user ? (
-          <Link
-            href={ROUTES.PARTY_CREATE}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2 font-semibold text-primary-foreground transition-colors hover:bg-gaming-purple-light"
-          >
-            파티 만들기
-          </Link>
-        ) : (
-          <Link
-            href={ROUTES.LOGIN}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#5865F2] px-6 py-2 font-semibold text-white transition-colors hover:bg-[#4752C4]"
-          >
-            디스코드로 로그인
-          </Link>
-        )}
-      </div>
+      {/* 파티 목록 */}
+      {parties.length > 0 ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {parties.map((party) => (
+            <PartyCard key={party.id} party={party} />
+          ))}
+        </div>
+      ) : (
+        <div className="glass-card flex flex-col items-center justify-center rounded-xl p-12 text-center">
+          <div className="mb-4 text-5xl">🎮</div>
+          <h3 className="mb-2 text-lg font-semibold">
+            아직 모집 중인 파티가 없습니다
+          </h3>
+          <p className="mb-6 text-sm text-muted-foreground">
+            첫 번째 파티를 만들어보세요!
+          </p>
+          {session?.user ? (
+            <Link
+              href={ROUTES.PARTY_CREATE}
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2 font-semibold text-primary-foreground transition-colors hover:bg-gaming-purple-light"
+            >
+              파티 만들기
+            </Link>
+          ) : (
+            <Link
+              href={ROUTES.LOGIN}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#5865F2] px-6 py-2 font-semibold text-white transition-colors hover:bg-[#4752C4]"
+            >
+              디스코드로 로그인
+            </Link>
+          )}
+        </div>
+      )}
     </div>
   );
 }
